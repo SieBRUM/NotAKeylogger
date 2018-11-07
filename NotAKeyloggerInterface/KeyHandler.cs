@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -9,23 +10,16 @@ namespace NotAKeyloggerInterface
     {
         // Import Windows dll's
         [DllImport("user32.dll")]
-        static extern int CallNextHookEx(IntPtr hhk, int code, int wParam, ref keyBoardHookStruct lParam);
-        [DllImport("user32.dll")]
         static extern IntPtr SetWindowsHookEx(int idHook, LLKeyboardHook callback, IntPtr hInstance, uint theardID);
         [DllImport("user32.dll")]
-        static extern bool UnhookWindowsHookEx(IntPtr hInstance);
+        static extern int CallNextHookEx(IntPtr hhk, int code, int wParam, ref keyBoardHookStruct lParam);
         [DllImport("kernel32.dll")]
         static extern IntPtr LoadLibrary(string lpFileName);
+        [DllImport("user32.dll")]
+        static extern bool UnhookWindowsHookEx(IntPtr hInstance);
 
         // Make keyboardhook public
         public delegate int LLKeyboardHook(int Code, int wParam, ref keyBoardHookStruct lParam);
-
-        // Set Windows event trigger values
-        const int WH_KEYBOARD_LL = 13;
-        const int WM_KEYDOWN = 0x0100;
-        const int WM_KEYUP = 0x0101;
-        const int WM_SYSKEYDOWN = 0x0104;
-        const int WM_SYSKEYUP = 0x0105;
 
         LLKeyboardHook llkh;
         // Store hooked keys (for current project, use all keys)
@@ -37,6 +31,14 @@ namespace NotAKeyloggerInterface
         public event KeyEventHandler KeyDown;
         public event KeyEventHandler KeyUp;
 
+        // Set Windows event trigger values
+        const int WM_KEYUP = 0x0101;
+        const int WM_SYSKEYUP = 0x0105;
+        const int WM_SYSKEYDOWN = 0x0104;
+        const int WM_KEYDOWN = 0x0100;
+        const int WH_KEYBOARD_LL = 13;
+
+        // Default keyboard hook struct, vkCode is only interesting data though
         public struct keyBoardHookStruct
         {
             public int vkCode;
@@ -46,10 +48,9 @@ namespace NotAKeyloggerInterface
             public int dwExtraInfo;
         }
 
-        // This is the Constructor. This is the code that runs every time you create a new GlobalKeyboardHook object
         public KeyHandler()
         {
-            llkh = new LLKeyboardHook(HookCallback);
+            llkh = new LLKeyboardHook(HookProc);
 
         }
         ~KeyHandler()
@@ -73,7 +74,7 @@ namespace NotAKeyloggerInterface
         }
 
         // Triggered when key is pressed and trigger functions that init this class 
-        public int HookCallback(int Code, int wParam, ref keyBoardHookStruct lParam)
+        public int HookProc(int Code, int wParam, ref keyBoardHookStruct lParam)
         {
             if (Code >= 0)
             {
