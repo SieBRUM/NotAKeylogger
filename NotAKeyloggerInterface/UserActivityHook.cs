@@ -113,10 +113,10 @@ namespace NotAKeyloggerInterface
         /// <summary>
         /// Handles when hook is fired (mouse activity detected)
         /// </summary>
-        /// <param name="nCode"></param>
-        /// <param name="wParam"></param>
-        /// <param name="lParam"></param>
-        /// <returns></returns>
+        /// <param name="nCode">Holds data if next callback call is needed</param>
+        /// <param name="wParam">Contains data about thread (if activity was on current thread)</param>
+        /// <param name="lParam">Contains pointer location to data</param>
+        /// <returns>Next callback data or 1 if done</returns>
         private int MouseHookProc(int nCode, int wParam, IntPtr lParam)
         {
             if ((nCode >= 0) && (OnMouseActivity != null))
@@ -155,10 +155,10 @@ namespace NotAKeyloggerInterface
         /// <summary>
         /// Fired when keyboard activity is detected
         /// </summary>
-        /// <param name="nCode"></param>
-        /// <param name="wParam"></param>
-        /// <param name="lParam"></param>
-        /// <returns></returns>
+        /// <param name="nCode">Holds data if next callback call is needed</param>
+        /// <param name="wParam">Contains data about thread (if activity was on current thread)</param>
+        /// <param name="lParam">Contains pointer location to data</param>
+        /// <returns>Next callback data or 1 if done</returns>
         private int KeyboardHookProc(int nCode, int wParam, IntPtr lParam)
         {
             bool handled = false;
