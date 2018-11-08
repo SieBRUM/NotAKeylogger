@@ -8,70 +8,59 @@ using static NotAKeyloggerInterface.DllImportFunctions;
 
 namespace NotAKeyloggerInterface
 {
-
     public class UserActivityHook
     {
+        // Create handlers
         public event MouseEventHandler OnMouseActivity;
         public event KeyEventHandler KeyDown;
         public event KeyPressEventHandler KeyPress;
         public event KeyEventHandler KeyUp;
 
+        // Set mousehook locs so we are able to unhook again
         private int hMouseHook = 0;
         private int hKeyboardHook = 0;
 
+        // Save hook procedures
         private static HookProc MouseHookProcedure;
         private static HookProc KeyboardHookProcedure;
 
+        // Destructor to make sure the hook gets removed
         ~UserActivityHook()
         {
-            //uninstall hooks and do not throw exceptions
             Stop(true, true, false);
         }
 
+        // Install all hooks
         public void Start()
         {
             Start(true, true);
         }
 
+        /// <summary>
+        /// Start hooks and throw error if fails
+        /// </summary>
+        /// <param name="InstallMouseHook"> if true; install mouse hook</param>
+        /// <param name="InstallKeyboardHook">if true; install keyboard hook</param>
         public void Start(bool InstallMouseHook, bool InstallKeyboardHook)
         {
-            // install Mouse hook only if it is not installed and must be installed
             if (hMouseHook == 0 && InstallMouseHook)
             {
-                // Create an instance of HookProc.
                 MouseHookProcedure = new HookProc(MouseHookProc);
-                //install hook
-                hMouseHook = SetWindowsHookEx(
-                    WindowsConstants.WH_MOUSE_LL,
-                    MouseHookProcedure,
-                    Marshal.GetHINSTANCE(
-                        Assembly.GetExecutingAssembly().GetModules()[0]),
-                    0);
-                //If SetWindowsHookEx fails.
+                hMouseHook = SetWindowsHookEx(WindowsConstants.WH_MOUSE_LL,MouseHookProcedure,Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]),0);
+
                 if (hMouseHook == 0)
                 {
-                    //Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set. 
                     int errorCode = Marshal.GetLastWin32Error();
-                    //do cleanup
                     Stop(true, false, false);
-                    //Initializes and throws a new instance of the Win32Exception class with the specified error. 
                     throw new Win32Exception(errorCode);
                 }
             }
 
-            // install Keyboard hook only if it is not installed and must be installed
             if (hKeyboardHook == 0 && InstallKeyboardHook)
             {
-                // Create an instance of HookProc.
                 KeyboardHookProcedure = new HookProc(KeyboardHookProc);
-                //install hook
-                hKeyboardHook = SetWindowsHookEx(
-                    WindowsConstants.WH_KEYBOARD_LL,
-                    KeyboardHookProcedure,
-                    Marshal.GetHINSTANCE(
-                    Assembly.GetExecutingAssembly().GetModules()[0]),
-                    0);
-                //If SetWindowsHookEx fails.
+                hKeyboardHook = SetWindowsHookEx(WindowsConstants.WH_KEYBOARD_LL,KeyboardHookProcedure,Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]),0);
+
                 if (hKeyboardHook == 0)
                 {
                     //Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set. 
@@ -84,57 +73,56 @@ namespace NotAKeyloggerInterface
             }
         }
 
+        // Unhook all
         public void Stop()
         {
             Stop(true, true, true);
         }
 
+        /// <summary>
+        /// Unhooks all hooked hooks (great sentence)
+        /// </summary>
+        /// <param name="UninstallMouseHook">if true; unhook mouse hook</param>
+        /// <param name="UninstallKeyboardHook">if true; unhook keyboard hook</param>
+        /// <param name="ThrowExceptions">if true; throws exeption if fails unhooking </param>
         public void Stop(bool UninstallMouseHook, bool UninstallKeyboardHook, bool ThrowExceptions)
         {
-            //if mouse hook set and must be uninstalled
             if (hMouseHook != 0 && UninstallMouseHook)
             {
-                //uninstall hook
                 int retMouse = UnhookWindowsHookEx(hMouseHook);
-                //reset invalid handle
                 hMouseHook = 0;
-                //if failed and exception must be thrown
                 if (retMouse == 0 && ThrowExceptions)
                 {
-                    //Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set. 
                     int errorCode = Marshal.GetLastWin32Error();
-                    //Initializes and throws a new instance of the Win32Exception class with the specified error. 
                     throw new Win32Exception(errorCode);
                 }
             }
 
-            //if keyboard hook set and must be uninstalled
             if (hKeyboardHook != 0 && UninstallKeyboardHook)
             {
-                //uninstall hook
                 int retKeyboard = UnhookWindowsHookEx(hKeyboardHook);
-                //reset invalid handle
                 hKeyboardHook = 0;
-                //if failed and exception must be thrown
                 if (retKeyboard == 0 && ThrowExceptions)
                 {
-                    //Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set. 
                     int errorCode = Marshal.GetLastWin32Error();
-                    //Initializes and throws a new instance of the Win32Exception class with the specified error. 
                     throw new Win32Exception(errorCode);
                 }
             }
         }
 
+        /// <summary>
+        /// Handles when hook is fired (mouse activity detected)
+        /// </summary>
+        /// <param name="nCode"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
         private int MouseHookProc(int nCode, int wParam, IntPtr lParam)
         {
-            // if ok and someone listens to our events
             if ((nCode >= 0) && (OnMouseActivity != null))
             {
-                //Marshall the data from callback.
                 MouseLLHookStruct mouseHookStruct = (MouseLLHookStruct)Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
 
-                //detect button clicked
                 MouseButtons button = MouseButtons.None;
                 short mouseDelta = 0;
                 switch (wParam)
@@ -150,36 +138,35 @@ namespace NotAKeyloggerInterface
                         break;
                 }
 
-                //double clicks
                 int clickCount = 0;
                 if (button != MouseButtons.None)
-                    if (wParam == WindowsConstants.WM_LBUTTONDBLCLK || wParam == WindowsConstants.WM_RBUTTONDBLCLK) clickCount = 2;
-                    else clickCount = 1;
+                    if (wParam == WindowsConstants.WM_LBUTTONDBLCLK || wParam == WindowsConstants.WM_RBUTTONDBLCLK)
+                        clickCount = 2;
+                    else
+                        clickCount = 1;
 
-                //generate event 
-                MouseEventArgs e = new MouseEventArgs(
-                                                   button,
-                                                   clickCount,
-                                                   mouseHookStruct.pt.x,
-                                                   mouseHookStruct.pt.y,
-                                                   mouseDelta);
-                //raise it
+                MouseEventArgs e = new MouseEventArgs(button,clickCount,mouseHookStruct.pt.x,mouseHookStruct.pt.y,mouseDelta);
                 OnMouseActivity(this, e);
             }
-            //call next hook
+
             return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
         }
 
-        private int KeyboardHookProc(int nCode, Int32 wParam, IntPtr lParam)
+        /// <summary>
+        /// Fired when keyboard activity is detected
+        /// </summary>
+        /// <param name="nCode"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        private int KeyboardHookProc(int nCode, int wParam, IntPtr lParam)
         {
-            //indicates if any of underlaing events set e.Handled flag
             bool handled = false;
-            //it was ok and someone listens to events
+
             if ((nCode >= 0) && (KeyDown != null || KeyUp != null || KeyPress != null))
             {
-                //read structure KeyboardHookStruct at lParam
                 KeyboardHookStruct MyKeyboardHookStruct = (KeyboardHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
-                //raise KeyDown
+
                 if (KeyDown != null && (wParam == WindowsConstants.WM_KEYDOWN || wParam == WindowsConstants.WM_SYSKEYDOWN))
                 {
                     Keys keyData = (Keys)MyKeyboardHookStruct.vkCode;
@@ -188,7 +175,6 @@ namespace NotAKeyloggerInterface
                     handled = handled || e.Handled;
                 }
 
-                // raise KeyPress
                 if (KeyPress != null && wParam == WindowsConstants.WM_KEYDOWN)
                 {
                     bool isDownShift = ((GetKeyState(WindowsConstants.VK_SHIFT) & 0x80) == 0x80 ? true : false);
@@ -197,21 +183,16 @@ namespace NotAKeyloggerInterface
                     byte[] keyState = new byte[256];
                     GetKeyboardState(keyState);
                     byte[] inBuffer = new byte[2];
-                    if (ToAscii(MyKeyboardHookStruct.vkCode,
-                              MyKeyboardHookStruct.scanCode,
-                              keyState,
-                              inBuffer,
-                              MyKeyboardHookStruct.flags) == 1)
+                    if (ToAscii(MyKeyboardHookStruct.vkCode,MyKeyboardHookStruct.scanCode,keyState,inBuffer,MyKeyboardHookStruct.flags) == 1)
                     {
                         char key = (char)inBuffer[0];
-                        if ((isDownCapslock ^ isDownShift) && Char.IsLetter(key)) key = Char.ToUpper(key);
+                        if ((isDownCapslock ^ isDownShift) && char.IsLetter(key)) key = char.ToUpper(key);
                         KeyPressEventArgs e = new KeyPressEventArgs(key);
                         KeyPress(this, e);
                         handled = handled || e.Handled;
                     }
                 }
 
-                // raise KeyUp
                 if (KeyUp != null && (wParam == WindowsConstants.WM_KEYUP || wParam == WindowsConstants.WM_SYSKEYUP))
                 {
                     Keys keyData = (Keys)MyKeyboardHookStruct.vkCode;
@@ -222,7 +203,6 @@ namespace NotAKeyloggerInterface
 
             }
 
-            //if event handled in application do not handoff to other listeners
             if (handled)
                 return 1;
             else

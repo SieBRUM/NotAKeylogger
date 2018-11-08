@@ -1,6 +1,6 @@
 ﻿namespace NotAKeyloggerInterface
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -36,12 +36,18 @@
             this.btnToggleLogging = new System.Windows.Forms.Button();
             this.cKeystrokes = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lblMouseLocation = new System.Windows.Forms.Label();
+            this.lblButtonPressed = new System.Windows.Forms.Label();
+            this.gbKeyboardData = new System.Windows.Forms.GroupBox();
+            this.gbMouseData = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.cKeystrokes)).BeginInit();
+            this.gbKeyboardData.SuspendLayout();
+            this.gbMouseData.SuspendLayout();
             this.SuspendLayout();
             // 
             // rtbKeylogger
             // 
-            this.rtbKeylogger.Location = new System.Drawing.Point(12, 42);
+            this.rtbKeylogger.BackColor = System.Drawing.SystemColors.Window;
+            this.rtbKeylogger.Location = new System.Drawing.Point(6, 19);
             this.rtbKeylogger.Name = "rtbKeylogger";
             this.rtbKeylogger.ReadOnly = true;
             this.rtbKeylogger.Size = new System.Drawing.Size(537, 42);
@@ -66,7 +72,7 @@
             this.cKeystrokes.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.cKeystrokes.Legends.Add(legend1);
-            this.cKeystrokes.Location = new System.Drawing.Point(13, 90);
+            this.cKeystrokes.Location = new System.Drawing.Point(7, 67);
             this.cKeystrokes.Name = "cKeystrokes";
             this.cKeystrokes.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
             series1.ChartArea = "ChartArea1";
@@ -75,7 +81,7 @@
             this.cKeystrokes.Series.Add(series1);
             this.cKeystrokes.Size = new System.Drawing.Size(536, 293);
             this.cKeystrokes.TabIndex = 2;
-            this.cKeystrokes.Text = "chart1";
+            this.cKeystrokes.Text = "Keyboard not hooked!";
             title1.Name = "Title1";
             title1.Text = "Keystrokes";
             this.cKeystrokes.Titles.Add(title1);
@@ -83,27 +89,59 @@
             // lblMouseLocation
             // 
             this.lblMouseLocation.AutoSize = true;
-            this.lblMouseLocation.Location = new System.Drawing.Point(324, 13);
+            this.lblMouseLocation.Location = new System.Drawing.Point(6, 48);
             this.lblMouseLocation.Name = "lblMouseLocation";
-            this.lblMouseLocation.Size = new System.Drawing.Size(35, 13);
+            this.lblMouseLocation.Size = new System.Drawing.Size(99, 13);
             this.lblMouseLocation.TabIndex = 3;
-            this.lblMouseLocation.Text = "label1";
+            this.lblMouseLocation.Text = "Mouse not hooked!";
             // 
-            // Form1
+            // lblButtonPressed
+            // 
+            this.lblButtonPressed.AutoSize = true;
+            this.lblButtonPressed.Location = new System.Drawing.Point(6, 19);
+            this.lblButtonPressed.Name = "lblButtonPressed";
+            this.lblButtonPressed.Size = new System.Drawing.Size(99, 13);
+            this.lblButtonPressed.TabIndex = 4;
+            this.lblButtonPressed.Text = "Mouse not hooked!";
+            // 
+            // gbKeyboardData
+            // 
+            this.gbKeyboardData.Controls.Add(this.rtbKeylogger);
+            this.gbKeyboardData.Controls.Add(this.cKeystrokes);
+            this.gbKeyboardData.Location = new System.Drawing.Point(13, 43);
+            this.gbKeyboardData.Name = "gbKeyboardData";
+            this.gbKeyboardData.Size = new System.Drawing.Size(556, 381);
+            this.gbKeyboardData.TabIndex = 5;
+            this.gbKeyboardData.TabStop = false;
+            this.gbKeyboardData.Text = "Keyboard data";
+            // 
+            // gbMouseData
+            // 
+            this.gbMouseData.Controls.Add(this.lblButtonPressed);
+            this.gbMouseData.Controls.Add(this.lblMouseLocation);
+            this.gbMouseData.Location = new System.Drawing.Point(575, 43);
+            this.gbMouseData.Name = "gbMouseData";
+            this.gbMouseData.Size = new System.Drawing.Size(317, 381);
+            this.gbMouseData.TabIndex = 6;
+            this.gbMouseData.TabStop = false;
+            this.gbMouseData.Text = "Mouse data";
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1464, 616);
-            this.Controls.Add(this.lblMouseLocation);
-            this.Controls.Add(this.cKeystrokes);
+            this.Controls.Add(this.gbMouseData);
+            this.Controls.Add(this.gbKeyboardData);
             this.Controls.Add(this.btnToggleLogging);
-            this.Controls.Add(this.rtbKeylogger);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Not so silent keylogger";
             this.Load += new System.EventHandler(this.InitializeHooks);
             ((System.ComponentModel.ISupportInitialize)(this.cKeystrokes)).EndInit();
+            this.gbKeyboardData.ResumeLayout(false);
+            this.gbMouseData.ResumeLayout(false);
+            this.gbMouseData.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -113,6 +151,9 @@
         private System.Windows.Forms.Button btnToggleLogging;
         private System.Windows.Forms.DataVisualization.Charting.Chart cKeystrokes;
         private System.Windows.Forms.Label lblMouseLocation;
+        private System.Windows.Forms.Label lblButtonPressed;
+        private System.Windows.Forms.GroupBox gbKeyboardData;
+        private System.Windows.Forms.GroupBox gbMouseData;
     }
 }
 

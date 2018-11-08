@@ -1,5 +1,8 @@
 ﻿namespace NotAKeyloggerInterface
 {
+    /// <summary>
+    /// Contains all constant values of the Windows eventhandlers
+    /// </summary>
     public static class WindowsConstants
     {
         public const int WH_MOUSE_LL = 14;

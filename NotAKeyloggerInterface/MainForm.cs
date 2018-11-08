@@ -4,19 +4,19 @@ using System.Windows.Forms;
 
 namespace NotAKeyloggerInterface
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         UserActivityHook UserActivitySpy;
         private Dictionary<string, int> Keystrokes;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             Keystrokes = new Dictionary<string, int>();
             UpdateChart();
         }
 
-        ~Form1()
+        ~MainForm()
         {
             // Make sure to unhook the logger, already happens in destructor of keyhook, but can never be sure enough...
             UserActivitySpy.Stop();
@@ -54,6 +54,7 @@ namespace NotAKeyloggerInterface
         private void MouseMovement(object sender, MouseEventArgs e)
         {
             lblMouseLocation.Text = string.Format("x={0}  y={1} wheel={2}", e.X, e.Y, e.Delta);
+            lblButtonPressed.Text = $"Button pressed: {e.Button}";
         }
 
         // Toggle keylogging hook
@@ -69,6 +70,8 @@ namespace NotAKeyloggerInterface
             {
                 UserActivitySpy.Stop();
                 btnToggleLogging.Text = "Start logging";
+                lblMouseLocation.Text = "Mouse not hooked!";
+                lblButtonPressed.Text = "Mouse not hooked!";
             }
         }
 
