@@ -1,46 +1,59 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace NotAKeyloggerInterface
 {
     public partial class Form1 : Form
     {
-        KeyHandler KeyHook;
+        UserActivityHook UserActivitySpy;
+        private Dictionary<string, int> Keystrokes;
 
         public Form1()
         {
             InitializeComponent();
+            Keystrokes = new Dictionary<string, int>();
+            UpdateChart();
         }
 
         ~Form1()
         {
             // Make sure to unhook the logger, already happens in destructor of keyhook, but can never be sure enough...
-            KeyHook.unhook();
+            UserActivitySpy.Stop();
         }
 
         private void InitializeHooks(object sender, EventArgs e)
         {
-            KeyHook = new KeyHandler();
-            KeyHook.KeyUp += new KeyEventHandler(ModifierKeysKeyUp);
-            KeyHook.KeyDown += new KeyEventHandler(NormalKeysKeyDown);
-
-            foreach (Keys key in Enum.GetValues(typeof(Keys)))
-                KeyHook.HookedKeys.Add(key);
+            UserActivitySpy = new UserActivityHook();
+            UserActivitySpy.KeyUp += new KeyEventHandler(ModifierKeysKeyUp);
+            UserActivitySpy.KeyDown += new KeyEventHandler(NormalKeysKeyDown);
+            UserActivitySpy.OnMouseActivity += new MouseEventHandler(MouseMovement);
         }
 
         // This is triggered for "special" keys like ctrl shift. Make sure to trigger these only when key-upping. 
-        public void ModifierKeysKeyUp(object sender, KeyEventArgs e)
+        private void ModifierKeysKeyUp(object sender, KeyEventArgs e)
         {
             string getCharVar = ModifierKeyToHumanReadable(e.KeyValue);
             if (getCharVar != null)
+            {
                 rtbKeylogger.Text += getCharVar;
+                WriteKeystrokesToDictionary(getCharVar);
+            }
         }
         // This is triggered for the rest of the keys (mostly non-modifier keys)
-        public void NormalKeysKeyDown(object sender, KeyEventArgs e)
+        private void NormalKeysKeyDown(object sender, KeyEventArgs e)
         {
             string getCharVar = KeyDownHandler(e.KeyValue);
             if (getCharVar != null)
+            {
                 rtbKeylogger.Text += getCharVar;
+                WriteKeystrokesToDictionary(getCharVar);
+            }
+        }
+
+        private void MouseMovement(object sender, MouseEventArgs e)
+        {
+            lblMouseLocation.Text = string.Format("x={0}  y={1} wheel={2}", e.X, e.Y, e.Delta);
         }
 
         // Toggle keylogging hook
@@ -49,12 +62,12 @@ namespace NotAKeyloggerInterface
             //Start the KeyboardHook
             if (btnToggleLogging.Text == "Start logging")
             {
-                KeyHook.hook();
+                UserActivitySpy.Start();
                 btnToggleLogging.Text = "Stop logging";
             }
             else
             {
-                KeyHook.unhook();
+                UserActivitySpy.Stop();
                 btnToggleLogging.Text = "Start logging";
             }
         }
@@ -113,6 +126,26 @@ namespace NotAKeyloggerInterface
                 return ((char)Value).ToString();
 
             return null;
+        }
+
+        private void WriteKeystrokesToDictionary(string key)
+        {
+            if (Keystrokes.ContainsKey(key))
+            {
+                Keystrokes[key]++;
+            }
+            else
+            {
+                Keystrokes.Add(key, 1);
+            }
+
+            UpdateChart();
+        }
+
+        private void UpdateChart()
+        {
+            cKeystrokes.Series["Keystrokes"].Points.DataBindXY(Keystrokes.Keys, Keystrokes.Values);
+            cKeystrokes.Series["Keystrokes"].Sort(System.Windows.Forms.DataVisualization.Charting.PointSortOrder.Descending);
         }
     }
 }
