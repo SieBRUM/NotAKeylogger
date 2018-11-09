@@ -18,6 +18,7 @@ namespace NotAKeyloggerInterface
         private Dictionary<MouseLocation, int> MouseLocations;
 
         private const int DEVIDE_SCREEN_SIZE = 3;
+        private bool CanDraw;
 
         public MainForm()
         {
@@ -26,8 +27,9 @@ namespace NotAKeyloggerInterface
             Keystrokes = new Dictionary<string, int>();
             Words = new Dictionary<string, int>();
             MouseLocations = new Dictionary<MouseLocation, int>();
-            plHeatmap.Height = Screen.PrimaryScreen.Bounds.Height / DEVIDE_SCREEN_SIZE;
-            plHeatmap.Width = Screen.PrimaryScreen.Bounds.Width / DEVIDE_SCREEN_SIZE;
+            pbMouseData.Height = Screen.PrimaryScreen.Bounds.Height / DEVIDE_SCREEN_SIZE;
+            pbMouseData.Width = Screen.PrimaryScreen.Bounds.Width / DEVIDE_SCREEN_SIZE;
+            CanDraw = false;
             UpdateChart();
         }
 
@@ -85,7 +87,7 @@ namespace NotAKeyloggerInterface
             }
 
 
-            plHeatmap.Refresh();
+            pbMouseData.Refresh();
         }
 
         // Toggle keylogging hook
@@ -96,6 +98,7 @@ namespace NotAKeyloggerInterface
             {
                 UserActivitySpy.Start();
                 tsmiToggleLogging.Text = "Stop hook";
+                CanDraw = true;
             }
             else
             {
@@ -103,6 +106,7 @@ namespace NotAKeyloggerInterface
                 tsmiToggleLogging.Text = "Enable hook";
                 lblMouseLocation.Text = "Mouse not hooked!";
                 lblButtonPressed.Text = "Mouse not hooked!";
+                CanDraw = false;
             }
         }
 
@@ -229,8 +233,11 @@ namespace NotAKeyloggerInterface
             if (MouseLocations.Count == 0)
                 return;
 
+            if (!CanDraw)
+                return;
+
             Bitmap buffer;
-            buffer = new Bitmap(plHeatmap.Width, plHeatmap.Height);
+            buffer = new Bitmap(pbMouseData.Width, pbMouseData.Height);
             //start an async task
             Task.Factory.StartNew(() =>
             {
@@ -247,7 +254,7 @@ namespace NotAKeyloggerInterface
                 //invoke an action against the main thread to draw the buffer to the background image of the main form.
                 Invoke(new Action(() =>
                 {
-                    plHeatmap.BackgroundImage = buffer;
+                    pbMouseData.BackgroundImage = buffer;
                 }));
             });
         }

@@ -40,17 +40,18 @@
             this.lblButtonPressed = new System.Windows.Forms.Label();
             this.gbKeyboardData = new System.Windows.Forms.GroupBox();
             this.gbMouseData = new System.Windows.Forms.GroupBox();
-            this.plHeatmap = new System.Windows.Forms.Panel();
             this.lbMouseLocations = new System.Windows.Forms.ListBox();
             this.msMain = new System.Windows.Forms.MenuStrip();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiToggleLogging = new System.Windows.Forms.ToolStripMenuItem();
             this.writeDataToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pbMouseData = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.cKeystrokes)).BeginInit();
             this.gbKeyboardData.SuspendLayout();
             this.gbMouseData.SuspendLayout();
             this.msMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMouseData)).BeginInit();
             this.SuspendLayout();
             // 
             // rtbKeylogger
@@ -72,7 +73,7 @@
             chartArea2.Name = "ChartArea2";
             this.cKeystrokes.ChartAreas.Add(chartArea1);
             this.cKeystrokes.ChartAreas.Add(chartArea2);
-            this.cKeystrokes.Location = new System.Drawing.Point(4, 67);
+            this.cKeystrokes.Location = new System.Drawing.Point(0, 65);
             this.cKeystrokes.Name = "cKeystrokes";
             this.cKeystrokes.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
             series1.ChartArea = "ChartArea1";
@@ -114,32 +115,23 @@
             this.gbKeyboardData.Controls.Add(this.cKeystrokes);
             this.gbKeyboardData.Location = new System.Drawing.Point(13, 27);
             this.gbKeyboardData.Name = "gbKeyboardData";
-            this.gbKeyboardData.Size = new System.Drawing.Size(560, 663);
+            this.gbKeyboardData.Size = new System.Drawing.Size(560, 541);
             this.gbKeyboardData.TabIndex = 5;
             this.gbKeyboardData.TabStop = false;
             this.gbKeyboardData.Text = "Keyboard data";
             // 
             // gbMouseData
             // 
-            this.gbMouseData.Controls.Add(this.plHeatmap);
+            this.gbMouseData.Controls.Add(this.pbMouseData);
             this.gbMouseData.Controls.Add(this.lbMouseLocations);
             this.gbMouseData.Controls.Add(this.lblButtonPressed);
             this.gbMouseData.Controls.Add(this.lblMouseLocation);
             this.gbMouseData.Location = new System.Drawing.Point(579, 27);
             this.gbMouseData.Name = "gbMouseData";
-            this.gbMouseData.Size = new System.Drawing.Size(900, 500);
+            this.gbMouseData.Size = new System.Drawing.Size(900, 541);
             this.gbMouseData.TabIndex = 6;
             this.gbMouseData.TabStop = false;
             this.gbMouseData.Text = "Mouse data";
-            // 
-            // plHeatmap
-            // 
-            this.plHeatmap.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.plHeatmap.Location = new System.Drawing.Point(135, 19);
-            this.plHeatmap.Name = "plHeatmap";
-            this.plHeatmap.Size = new System.Drawing.Size(469, 303);
-            this.plHeatmap.TabIndex = 6;
-            this.plHeatmap.Paint += new System.Windows.Forms.PaintEventHandler(this.PaintHeatmap);
             // 
             // lbMouseLocations
             // 
@@ -190,11 +182,21 @@
             this.debugDataToolStripMenuItem.Text = "Debug data";
             this.debugDataToolStripMenuItem.Click += new System.EventHandler(this.debugDataToolStripMenuItem_Click);
             // 
+            // pbMouseData
+            // 
+            this.pbMouseData.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.pbMouseData.Location = new System.Drawing.Point(135, 19);
+            this.pbMouseData.Name = "pbMouseData";
+            this.pbMouseData.Size = new System.Drawing.Size(100, 50);
+            this.pbMouseData.TabIndex = 7;
+            this.pbMouseData.TabStop = false;
+            this.pbMouseData.Paint += new System.Windows.Forms.PaintEventHandler(this.PaintHeatmap);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1747, 848);
+            this.ClientSize = new System.Drawing.Size(1747, 587);
             this.Controls.Add(this.gbMouseData);
             this.Controls.Add(this.gbKeyboardData);
             this.Controls.Add(this.msMain);
@@ -209,6 +211,7 @@
             this.gbMouseData.PerformLayout();
             this.msMain.ResumeLayout(false);
             this.msMain.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMouseData)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -228,7 +231,7 @@
         private System.Windows.Forms.ListBox lbMouseLocations;
         private System.Windows.Forms.ToolStripMenuItem writeDataToFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem debugDataToolStripMenuItem;
-        public System.Windows.Forms.Panel plHeatmap;
+        public System.Windows.Forms.PictureBox pbMouseData;
     }
 }
 
