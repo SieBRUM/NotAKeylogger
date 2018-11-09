@@ -37,6 +37,7 @@ namespace NotAKeyloggerInterface
         {
             // Make sure to unhook the logger, already happens in destructor of keyhook, but can never be sure enough...
             UserActivitySpy.Stop();
+            CanDraw = false;
         }
 
         private void InitializeHooks(object sender, EventArgs e)
@@ -86,7 +87,7 @@ namespace NotAKeyloggerInterface
                 MouseLocations.Add(loc, 1);
             }
 
-
+            CanDraw = true;
             pbMouseData.Refresh();
         }
 
@@ -235,6 +236,7 @@ namespace NotAKeyloggerInterface
 
             if (!CanDraw)
                 return;
+            CanDraw = false;
 
             Bitmap buffer;
             buffer = new Bitmap(pbMouseData.Width, pbMouseData.Height);
