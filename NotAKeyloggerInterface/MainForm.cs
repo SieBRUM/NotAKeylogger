@@ -6,13 +6,16 @@ namespace NotAKeyloggerInterface
 {
     public partial class MainForm : Form
     {
-        UserActivityHook UserActivitySpy;
+        private UserActivityHook UserActivitySpy;
+        private string currentWord = "";
         private Dictionary<string, int> Keystrokes;
+        private Dictionary<string, int> Words;
 
         public MainForm()
         {
             InitializeComponent();
             Keystrokes = new Dictionary<string, int>();
+            Words = new Dictionary<string, int>();
             UpdateChart();
         }
 
@@ -61,15 +64,15 @@ namespace NotAKeyloggerInterface
         private void ToggleLoggingHook(object sender, EventArgs e)
         {
             //Start the KeyboardHook
-            if (btnToggleLogging.Text == "Start logging")
+            if (tsmiToggleLogging.Text == "Start logging")
             {
                 UserActivitySpy.Start();
-                btnToggleLogging.Text = "Stop logging";
+                tsmiToggleLogging.Text = "Stop logging";
             }
             else
             {
                 UserActivitySpy.Stop();
-                btnToggleLogging.Text = "Start logging";
+                tsmiToggleLogging.Text = "Start logging";
                 lblMouseLocation.Text = "Mouse not hooked!";
                 lblButtonPressed.Text = "Mouse not hooked!";
             }
@@ -81,7 +84,7 @@ namespace NotAKeyloggerInterface
             switch (Value)
             {
                 case 8:
-                    return "[Backspace]";
+                    return "";
                 case 9:
                     return "[Tab]";
                 case 13:
@@ -100,7 +103,7 @@ namespace NotAKeyloggerInterface
                 case 32:
                     return " ";
                 case 46:
-                    return "[Delete]";
+                    return "";
                 case 163:
                     return "[R_Alt]";
                 case 165:
@@ -133,6 +136,24 @@ namespace NotAKeyloggerInterface
 
         private void WriteKeystrokesToDictionary(string key)
         {
+            if(key == " ")
+            {
+                if (Words.ContainsKey(currentWord))
+                {
+                    Words[currentWord]++;
+                }
+                else
+                {
+                    Words.Add(currentWord, 1);
+                }
+
+                currentWord = "";
+            }
+            else
+            {
+                currentWord += key;
+            }
+
             if (Keystrokes.ContainsKey(key))
             {
                 Keystrokes[key]++;
@@ -149,6 +170,8 @@ namespace NotAKeyloggerInterface
         {
             cKeystrokes.Series["Keystrokes"].Points.DataBindXY(Keystrokes.Keys, Keystrokes.Values);
             cKeystrokes.Series["Keystrokes"].Sort(System.Windows.Forms.DataVisualization.Charting.PointSortOrder.Descending);
+            cKeystrokes.Series["Words"].Points.DataBindXY(Words.Keys, Words.Values);
+            cKeystrokes.Series["Words"].Sort(System.Windows.Forms.DataVisualization.Charting.PointSortOrder.Descending);
         }
     }
 }
