@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Linq;
 using static NotAKeyloggerInterface.HookStructs;
+using System.Threading.Tasks;
 
 namespace NotAKeyloggerInterface
 {
@@ -14,12 +17,17 @@ namespace NotAKeyloggerInterface
         private Dictionary<string, int> Words;
         private Dictionary<MouseLocation, int> MouseLocations;
 
+        private const int DEVIDE_SCREEN_SIZE = 3;
+
         public MainForm()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
             Keystrokes = new Dictionary<string, int>();
             Words = new Dictionary<string, int>();
             MouseLocations = new Dictionary<MouseLocation, int>();
+            plHeatmap.Height = Screen.PrimaryScreen.Bounds.Height / DEVIDE_SCREEN_SIZE;
+            plHeatmap.Width = Screen.PrimaryScreen.Bounds.Width / DEVIDE_SCREEN_SIZE;
             UpdateChart();
         }
 
@@ -61,13 +69,13 @@ namespace NotAKeyloggerInterface
         private void MouseMovement(object sender, MouseEventArgs e)
         {
             lblMouseLocation.Text = string.Format("x={0}  y={1} wheel={2}", e.X, e.Y, e.Delta);
-            lblButtonPressed.Text = $"Button pressed: {e.Button}";
+            lblButtonPressed.Text= $"Button pressed: {e.Button}";
 
             MouseLocation loc = new MouseLocation();
             loc.x = e.X;
             loc.y = e.Y;
 
-            if(MouseLocations.ContainsKey(loc))
+            if (MouseLocations.ContainsKey(loc))
             {
                 MouseLocations[loc]++;
             }
@@ -76,7 +84,8 @@ namespace NotAKeyloggerInterface
                 MouseLocations.Add(loc, 1);
             }
 
-            UpdateListbox();
+
+            plHeatmap.Refresh();
         }
 
         // Toggle keylogging hook
@@ -137,7 +146,7 @@ namespace NotAKeyloggerInterface
             // If between those values, numpad is pressed. When removing 48, it will use the "normal" keyboard numberss
             if (Value > 95 && Value < 106)
                 return ((char)(Value - 48)).ToString();
-            
+
             // Normal alphabet
             if (Value > 64 && Value < 91)
             {
@@ -155,7 +164,7 @@ namespace NotAKeyloggerInterface
 
         private void WriteKeystrokesToDictionary(string key)
         {
-            if(key == " ")
+            if (key == " ")
             {
                 if (Words.ContainsKey(currentWord))
                 {
@@ -193,13 +202,6 @@ namespace NotAKeyloggerInterface
             cKeystrokes.Series["Words"].Sort(System.Windows.Forms.DataVisualization.Charting.PointSortOrder.Descending);
         }
 
-        private void UpdateListbox()
-        {
-            lbMouseLocations.DataSource = new BindingSource(MouseLocations, null);
-            lbMouseLocations.DisplayMember = "Value";
-            lbMouseLocations.ValueMember = "Key";
-        }
-
         private void WriteToFile(object sender, EventArgs e)
         {
             SaveFileDialog dialog = new SaveFileDialog();
@@ -216,5 +218,39 @@ namespace NotAKeyloggerInterface
                 }
             }
         }
+
+        private void debugDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show($"Screen width: {Screen.PrimaryScreen.Bounds.Width} \nScreen height: {Screen.PrimaryScreen.Bounds.Height} \nScreen size: {Screen.PrimaryScreen.Bounds.Size}");
+        }
+
+        private void PaintHeatmap(object sender, PaintEventArgs e)
+        {
+            if (MouseLocations.Count == 0)
+                return;
+
+            Bitmap buffer;
+            buffer = new Bitmap(plHeatmap.Width, plHeatmap.Height);
+            //start an async task
+            Task.Factory.StartNew(() =>
+            {
+                using (Graphics g = Graphics.FromImage(buffer))
+                {
+                    Point point = new Point(MouseLocations.Last().Key.x / DEVIDE_SCREEN_SIZE, MouseLocations.Last().Key.y / DEVIDE_SCREEN_SIZE);
+                    Size size = new Size(10, 10);
+                    Rectangle rectangle = new Rectangle(point, size);
+                    SolidBrush brush = new SolidBrush(Color.Yellow);
+
+                    g.FillEllipse(brush, rectangle);
+                    //do your drawing routines here
+                }
+                //invoke an action against the main thread to draw the buffer to the background image of the main form.
+                Invoke(new Action(() =>
+                {
+                    plHeatmap.BackgroundImage = buffer;
+                }));
+            });
+        }
+
     }
 }
