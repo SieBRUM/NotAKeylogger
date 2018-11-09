@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
+using static NotAKeyloggerInterface.HookStructs;
 
 namespace NotAKeyloggerInterface
 {
@@ -10,12 +12,14 @@ namespace NotAKeyloggerInterface
         private string currentWord = "";
         private Dictionary<string, int> Keystrokes;
         private Dictionary<string, int> Words;
+        private Dictionary<MouseLocation, int> MouseLocations;
 
         public MainForm()
         {
             InitializeComponent();
             Keystrokes = new Dictionary<string, int>();
             Words = new Dictionary<string, int>();
+            MouseLocations = new Dictionary<MouseLocation, int>();
             UpdateChart();
         }
 
@@ -58,21 +62,36 @@ namespace NotAKeyloggerInterface
         {
             lblMouseLocation.Text = string.Format("x={0}  y={1} wheel={2}", e.X, e.Y, e.Delta);
             lblButtonPressed.Text = $"Button pressed: {e.Button}";
+
+            MouseLocation loc = new MouseLocation();
+            loc.x = e.X;
+            loc.y = e.Y;
+
+            if(MouseLocations.ContainsKey(loc))
+            {
+                MouseLocations[loc]++;
+            }
+            else
+            {
+                MouseLocations.Add(loc, 1);
+            }
+
+            UpdateListbox();
         }
 
         // Toggle keylogging hook
         private void ToggleLoggingHook(object sender, EventArgs e)
         {
             //Start the KeyboardHook
-            if (tsmiToggleLogging.Text == "Start logging")
+            if (tsmiToggleLogging.Text == "Enable hook")
             {
                 UserActivitySpy.Start();
-                tsmiToggleLogging.Text = "Stop logging";
+                tsmiToggleLogging.Text = "Stop hook";
             }
             else
             {
                 UserActivitySpy.Stop();
-                tsmiToggleLogging.Text = "Start logging";
+                tsmiToggleLogging.Text = "Enable hook";
                 lblMouseLocation.Text = "Mouse not hooked!";
                 lblButtonPressed.Text = "Mouse not hooked!";
             }
@@ -172,6 +191,30 @@ namespace NotAKeyloggerInterface
             cKeystrokes.Series["Keystrokes"].Sort(System.Windows.Forms.DataVisualization.Charting.PointSortOrder.Descending);
             cKeystrokes.Series["Words"].Points.DataBindXY(Words.Keys, Words.Values);
             cKeystrokes.Series["Words"].Sort(System.Windows.Forms.DataVisualization.Charting.PointSortOrder.Descending);
+        }
+
+        private void UpdateListbox()
+        {
+            lbMouseLocations.DataSource = new BindingSource(MouseLocations, null);
+            lbMouseLocations.DisplayMember = "Value";
+            lbMouseLocations.ValueMember = "Key";
+        }
+
+        private void WriteToFile(object sender, EventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "txt files (*.txt)|*.txt";
+            dialog.InitialDirectory = @"%userprofile%\Desktop";
+            dialog.Title = "Please select location of save file";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter file = File.AppendText(dialog.FileName))
+                {
+                    file.WriteLine(rtbKeylogger.Text);
+                    file.Close();
+                }
+            }
         }
     }
 }

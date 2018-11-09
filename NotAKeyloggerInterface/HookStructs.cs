@@ -8,7 +8,7 @@ namespace NotAKeyloggerInterface
     public class HookStructs
     {
         [StructLayout(LayoutKind.Sequential)]
-        public class POINT
+        public class MouseLocation
         {
             public int x;
             public int y;
@@ -17,7 +17,7 @@ namespace NotAKeyloggerInterface
         [StructLayout(LayoutKind.Sequential)]
         public class MouseHookStruct
         {
-            public POINT pt;
+            public MouseLocation pt;
             public int hwnd;
             public int wHitTestCode;
             public int dwExtraInfo;
@@ -26,7 +26,7 @@ namespace NotAKeyloggerInterface
         [StructLayout(LayoutKind.Sequential)]
         public class MouseLLHookStruct
         {
-            public POINT pt;
+            public MouseLocation pt;
             public int mouseData;
             public int flags;
             public int time;
