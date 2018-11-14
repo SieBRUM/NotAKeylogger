@@ -40,18 +40,19 @@
             this.lblButtonPressed = new System.Windows.Forms.Label();
             this.gbKeyboardData = new System.Windows.Forms.GroupBox();
             this.gbMouseData = new System.Windows.Forms.GroupBox();
+            this.pbMouseData = new System.Windows.Forms.PictureBox();
             this.lbMouseLocations = new System.Windows.Forms.ListBox();
             this.msMain = new System.Windows.Forms.MenuStrip();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiToggleLogging = new System.Windows.Forms.ToolStripMenuItem();
             this.writeDataToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pbMouseData = new System.Windows.Forms.PictureBox();
+            this.lblCurrentWindow = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.cKeystrokes)).BeginInit();
             this.gbKeyboardData.SuspendLayout();
             this.gbMouseData.SuspendLayout();
-            this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMouseData)).BeginInit();
+            this.msMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // rtbKeylogger
@@ -122,6 +123,7 @@
             // 
             // gbMouseData
             // 
+            this.gbMouseData.Controls.Add(this.lblCurrentWindow);
             this.gbMouseData.Controls.Add(this.pbMouseData);
             this.gbMouseData.Controls.Add(this.lbMouseLocations);
             this.gbMouseData.Controls.Add(this.lblButtonPressed);
@@ -132,6 +134,16 @@
             this.gbMouseData.TabIndex = 6;
             this.gbMouseData.TabStop = false;
             this.gbMouseData.Text = "Mouse data";
+            // 
+            // pbMouseData
+            // 
+            this.pbMouseData.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.pbMouseData.Location = new System.Drawing.Point(135, 19);
+            this.pbMouseData.Name = "pbMouseData";
+            this.pbMouseData.Size = new System.Drawing.Size(100, 50);
+            this.pbMouseData.TabIndex = 7;
+            this.pbMouseData.TabStop = false;
+            this.pbMouseData.Paint += new System.Windows.Forms.PaintEventHandler(this.PaintHeatmap);
             // 
             // lbMouseLocations
             // 
@@ -182,15 +194,14 @@
             this.debugDataToolStripMenuItem.Text = "Debug data";
             this.debugDataToolStripMenuItem.Click += new System.EventHandler(this.debugDataToolStripMenuItem_Click);
             // 
-            // pbMouseData
+            // lblCurrentWindow
             // 
-            this.pbMouseData.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.pbMouseData.Location = new System.Drawing.Point(135, 19);
-            this.pbMouseData.Name = "pbMouseData";
-            this.pbMouseData.Size = new System.Drawing.Size(100, 50);
-            this.pbMouseData.TabIndex = 7;
-            this.pbMouseData.TabStop = false;
-            this.pbMouseData.Paint += new System.Windows.Forms.PaintEventHandler(this.PaintHeatmap);
+            this.lblCurrentWindow.AutoSize = true;
+            this.lblCurrentWindow.Location = new System.Drawing.Point(9, 518);
+            this.lblCurrentWindow.Name = "lblCurrentWindow";
+            this.lblCurrentWindow.Size = new System.Drawing.Size(99, 13);
+            this.lblCurrentWindow.TabIndex = 8;
+            this.lblCurrentWindow.Text = "Mouse not hooked!";
             // 
             // MainForm
             // 
@@ -209,9 +220,9 @@
             this.gbKeyboardData.ResumeLayout(false);
             this.gbMouseData.ResumeLayout(false);
             this.gbMouseData.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMouseData)).EndInit();
             this.msMain.ResumeLayout(false);
             this.msMain.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbMouseData)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -232,6 +243,7 @@
         private System.Windows.Forms.ToolStripMenuItem writeDataToFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem debugDataToolStripMenuItem;
         public System.Windows.Forms.PictureBox pbMouseData;
+        private System.Windows.Forms.Label lblCurrentWindow;
     }
 }
 

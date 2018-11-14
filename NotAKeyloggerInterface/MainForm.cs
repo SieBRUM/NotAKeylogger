@@ -4,8 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Linq;
-using static NotAKeyloggerInterface.HookStructs;
 using System.Threading.Tasks;
+using System.Text;
+using static NotAKeyloggerInterface.HookStructs;
+using static NotAKeyloggerInterface.DllImportFunctions;
 
 namespace NotAKeyloggerInterface
 {
@@ -87,6 +89,10 @@ namespace NotAKeyloggerInterface
                 MouseLocations.Add(loc, 1);
             }
 
+            string currentWindow = GetActiveWindowTitle();
+
+            lblCurrentWindow.Text = $"Active window: {(currentWindow != null ? currentWindow : "Unknown")}";
+
             CanDraw = true;
             pbMouseData.Refresh();
         }
@@ -107,6 +113,7 @@ namespace NotAKeyloggerInterface
                 tsmiToggleLogging.Text = "Enable hook";
                 lblMouseLocation.Text = "Mouse not hooked!";
                 lblButtonPressed.Text = "Mouse not hooked!";
+                lblCurrentWindow.Text = "Mouse not hooked!";
                 CanDraw = false;
             }
         }
@@ -226,7 +233,7 @@ namespace NotAKeyloggerInterface
 
         private void debugDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show($"Screen width: {Screen.PrimaryScreen.Bounds.Width} \nScreen height: {Screen.PrimaryScreen.Bounds.Height} \nScreen size: {Screen.PrimaryScreen.Bounds.Size}");
+            MessageBox.Show($"screen width: {Screen.PrimaryScreen.Bounds.Width} \nScreen heighta: {Screen.PrimaryScreen.Bounds.Height} \nScreen size: {Screen.PrimaryScreen.Bounds.Size}");
         }
 
         private void PaintHeatmap(object sender, PaintEventArgs e)
@@ -236,6 +243,7 @@ namespace NotAKeyloggerInterface
 
             if (!CanDraw)
                 return;
+            
             CanDraw = false;
 
             Bitmap buffer;
@@ -259,6 +267,20 @@ namespace NotAKeyloggerInterface
                     pbMouseData.BackgroundImage = buffer;
                 }));
             });
+        }
+
+        private string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+
+            return null;
         }
 
     }
