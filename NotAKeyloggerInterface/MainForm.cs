@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text;
 using static NotAKeyloggerInterface.HookStructs;
 using static NotAKeyloggerInterface.DllImportFunctions;
+using Microsoft.Win32;
 
 namespace NotAKeyloggerInterface
 {
@@ -32,7 +33,21 @@ namespace NotAKeyloggerInterface
             pbMouseData.Height = Screen.PrimaryScreen.Bounds.Height / DEVIDE_SCREEN_SIZE;
             pbMouseData.Width = Screen.PrimaryScreen.Bounds.Width / DEVIDE_SCREEN_SIZE;
             CanDraw = false;
+
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if(rk.GetValue("NotAKeyloggerInterface") != null)
+            {
+                if((string)rk.GetValue("NotAKeyloggerInterface") != Application.ExecutablePath)
+                {
+                    rk.DeleteValue("NotAKeyloggerInterface");
+                }
+                else
+                {
+                    runOnWindowsToolStripMenuItem.Text = "Disable run on startup";
+                }
+            }
             UpdateChart();
+
         }
 
         ~MainForm()
@@ -74,7 +89,7 @@ namespace NotAKeyloggerInterface
         private void MouseMovement(object sender, MouseEventArgs e)
         {
             lblMouseLocation.Text = string.Format("x={0}  y={1} wheel={2}", e.X, e.Y, e.Delta);
-            lblButtonPressed.Text= $"Button pressed: {e.Button}";
+            lblButtonPressed.Text = $"Button pressed: {e.Button}";
 
             MouseLocation loc = new MouseLocation();
             loc.x = e.X;
@@ -243,7 +258,7 @@ namespace NotAKeyloggerInterface
 
             if (!CanDraw)
                 return;
-            
+
             CanDraw = false;
 
             Bitmap buffer;
@@ -283,5 +298,22 @@ namespace NotAKeyloggerInterface
             return null;
         }
 
+        private void ToggleStartup(object sender, EventArgs e)
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            if(rk.GetValue("NotAKeyloggerInterface") == null)
+            {
+                rk.SetValue("NotAKeyloggerInterface", Application.ExecutablePath);
+                MessageBox.Show("Enabled run on startup");
+                runOnWindowsToolStripMenuItem.Text = "Disable run on startup";
+            }
+            else
+            {
+                rk.DeleteValue("NotAKeyloggerInterface");
+                MessageBox.Show("Disabled run on startup");
+                runOnWindowsToolStripMenuItem.Text = "Enable run on startup";
+            }
+        }
     }
 }

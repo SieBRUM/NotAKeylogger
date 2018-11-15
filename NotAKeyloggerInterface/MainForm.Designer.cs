@@ -40,6 +40,7 @@
             this.lblButtonPressed = new System.Windows.Forms.Label();
             this.gbKeyboardData = new System.Windows.Forms.GroupBox();
             this.gbMouseData = new System.Windows.Forms.GroupBox();
+            this.lblCurrentWindow = new System.Windows.Forms.Label();
             this.pbMouseData = new System.Windows.Forms.PictureBox();
             this.lbMouseLocations = new System.Windows.Forms.ListBox();
             this.msMain = new System.Windows.Forms.MenuStrip();
@@ -47,7 +48,7 @@
             this.tsmiToggleLogging = new System.Windows.Forms.ToolStripMenuItem();
             this.writeDataToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lblCurrentWindow = new System.Windows.Forms.Label();
+            this.runOnWindowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.cKeystrokes)).BeginInit();
             this.gbKeyboardData.SuspendLayout();
             this.gbMouseData.SuspendLayout();
@@ -135,6 +136,15 @@
             this.gbMouseData.TabStop = false;
             this.gbMouseData.Text = "Mouse data";
             // 
+            // lblCurrentWindow
+            // 
+            this.lblCurrentWindow.AutoSize = true;
+            this.lblCurrentWindow.Location = new System.Drawing.Point(9, 518);
+            this.lblCurrentWindow.Name = "lblCurrentWindow";
+            this.lblCurrentWindow.Size = new System.Drawing.Size(99, 13);
+            this.lblCurrentWindow.TabIndex = 8;
+            this.lblCurrentWindow.Text = "Mouse not hooked!";
+            // 
             // pbMouseData
             // 
             this.pbMouseData.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
@@ -168,7 +178,8 @@
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiToggleLogging,
             this.writeDataToFileToolStripMenuItem,
-            this.debugDataToolStripMenuItem});
+            this.debugDataToolStripMenuItem,
+            this.runOnWindowsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -176,32 +187,30 @@
             // tsmiToggleLogging
             // 
             this.tsmiToggleLogging.Name = "tsmiToggleLogging";
-            this.tsmiToggleLogging.Size = new System.Drawing.Size(161, 22);
+            this.tsmiToggleLogging.Size = new System.Drawing.Size(187, 22);
             this.tsmiToggleLogging.Text = "Enable hook";
             this.tsmiToggleLogging.Click += new System.EventHandler(this.ToggleLoggingHook);
             // 
             // writeDataToFileToolStripMenuItem
             // 
             this.writeDataToFileToolStripMenuItem.Name = "writeDataToFileToolStripMenuItem";
-            this.writeDataToFileToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.writeDataToFileToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.writeDataToFileToolStripMenuItem.Text = "Write data to file";
             this.writeDataToFileToolStripMenuItem.Click += new System.EventHandler(this.WriteToFile);
             // 
             // debugDataToolStripMenuItem
             // 
             this.debugDataToolStripMenuItem.Name = "debugDataToolStripMenuItem";
-            this.debugDataToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.debugDataToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.debugDataToolStripMenuItem.Text = "Debug data";
             this.debugDataToolStripMenuItem.Click += new System.EventHandler(this.debugDataToolStripMenuItem_Click);
             // 
-            // lblCurrentWindow
+            // runOnWindowsToolStripMenuItem
             // 
-            this.lblCurrentWindow.AutoSize = true;
-            this.lblCurrentWindow.Location = new System.Drawing.Point(9, 518);
-            this.lblCurrentWindow.Name = "lblCurrentWindow";
-            this.lblCurrentWindow.Size = new System.Drawing.Size(99, 13);
-            this.lblCurrentWindow.TabIndex = 8;
-            this.lblCurrentWindow.Text = "Mouse not hooked!";
+            this.runOnWindowsToolStripMenuItem.Name = "runOnWindowsToolStripMenuItem";
+            this.runOnWindowsToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.runOnWindowsToolStripMenuItem.Text = "Enable run on startup";
+            this.runOnWindowsToolStripMenuItem.Click += new System.EventHandler(this.ToggleStartup);
             // 
             // MainForm
             // 
@@ -244,6 +253,7 @@
         private System.Windows.Forms.ToolStripMenuItem debugDataToolStripMenuItem;
         public System.Windows.Forms.PictureBox pbMouseData;
         private System.Windows.Forms.Label lblCurrentWindow;
+        private System.Windows.Forms.ToolStripMenuItem runOnWindowsToolStripMenuItem;
     }
 }
 
