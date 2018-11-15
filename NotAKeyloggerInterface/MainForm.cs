@@ -6,9 +6,9 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
+using Microsoft.Win32;
 using static NotAKeyloggerInterface.HookStructs;
 using static NotAKeyloggerInterface.DllImportFunctions;
-using Microsoft.Win32;
 
 namespace NotAKeyloggerInterface
 {
@@ -26,28 +26,14 @@ namespace NotAKeyloggerInterface
         public MainForm()
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
             Keystrokes = new Dictionary<string, int>();
             Words = new Dictionary<string, int>();
             MouseLocations = new Dictionary<MouseLocation, int>();
             pbMouseData.Height = Screen.PrimaryScreen.Bounds.Height / DEVIDE_SCREEN_SIZE;
             pbMouseData.Width = Screen.PrimaryScreen.Bounds.Width / DEVIDE_SCREEN_SIZE;
             CanDraw = false;
-
-            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            if(rk.GetValue("NotAKeyloggerInterface") != null)
-            {
-                if((string)rk.GetValue("NotAKeyloggerInterface") != Application.ExecutablePath)
-                {
-                    rk.DeleteValue("NotAKeyloggerInterface");
-                }
-                else
-                {
-                    runOnWindowsToolStripMenuItem.Text = "Disable run on startup";
-                }
-            }
             UpdateChart();
-
         }
 
         ~MainForm()
@@ -63,6 +49,20 @@ namespace NotAKeyloggerInterface
             UserActivitySpy.KeyUp += new KeyEventHandler(ModifierKeysKeyUp);
             UserActivitySpy.KeyDown += new KeyEventHandler(NormalKeysKeyDown);
             UserActivitySpy.OnMouseActivity += new MouseEventHandler(MouseMovement);
+
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (rk.GetValue("NotAKeyloggerInterface") != null)
+            {
+                if ((string)rk.GetValue("NotAKeyloggerInterface") != Application.ExecutablePath)
+                {
+                    rk.DeleteValue("NotAKeyloggerInterface");
+                }
+                else
+                {
+                    runOnWindowsToolStripMenuItem.Text = "Disable run on startup";
+                    ToggleLoggingHook(null, null);
+                }
+            }
         }
 
         // This is triggered for "special" keys like ctrl shift. Make sure to trigger these only when key-upping. 
@@ -75,6 +75,7 @@ namespace NotAKeyloggerInterface
                 WriteKeystrokesToDictionary(getCharVar);
             }
         }
+
         // This is triggered for the rest of the keys (mostly non-modifier keys)
         private void NormalKeysKeyDown(object sender, KeyEventArgs e)
         {
@@ -91,9 +92,11 @@ namespace NotAKeyloggerInterface
             lblMouseLocation.Text = string.Format("x={0}  y={1} wheel={2}", e.X, e.Y, e.Delta);
             lblButtonPressed.Text = $"Button pressed: {e.Button}";
 
-            MouseLocation loc = new MouseLocation();
-            loc.x = e.X;
-            loc.y = e.Y;
+            MouseLocation loc = new MouseLocation
+            {
+                x = e.X,
+                y = e.Y
+            };
 
             if (MouseLocations.ContainsKey(loc))
             {
@@ -106,7 +109,7 @@ namespace NotAKeyloggerInterface
 
             string currentWindow = GetActiveWindowTitle();
 
-            lblCurrentWindow.Text = $"Active window: {(currentWindow != null ? currentWindow : "Unknown")}";
+            lblCurrentWindow.Text = $"Active window: {(currentWindow ?? "Unknown")}";
 
             CanDraw = true;
             pbMouseData.Refresh();
@@ -231,10 +234,12 @@ namespace NotAKeyloggerInterface
 
         private void WriteToFile(object sender, EventArgs e)
         {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "txt files (*.txt)|*.txt";
-            dialog.InitialDirectory = @"%userprofile%\Desktop";
-            dialog.Title = "Please select location of save file";
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Filter = "txt files (*.txt)|*.txt",
+                InitialDirectory = @"%userprofile%\Desktop",
+                Title = "Please select location of save file"
+            };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -305,7 +310,7 @@ namespace NotAKeyloggerInterface
             if(rk.GetValue("NotAKeyloggerInterface") == null)
             {
                 rk.SetValue("NotAKeyloggerInterface", Application.ExecutablePath);
-                MessageBox.Show("Enabled run on startup");
+                MessageBox.Show("Enabled run on startup. HOOK WILL NOT BOOT ON STARTUP!");
                 runOnWindowsToolStripMenuItem.Text = "Disable run on startup";
             }
             else
